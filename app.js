@@ -63,7 +63,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   /* ==========================================================================
-     2. 3D Sustainability Globe Hotspots
+     2. 3D Sustainability Globe Hotspots & Interactive Kinetic Physics
      ========================================================================== */
   function initGlobeHotspots() {
     $$(".globe-spot").forEach((spot) => {
@@ -78,6 +78,59 @@ document.addEventListener("DOMContentLoaded", () => {
         }
       });
     });
+
+    // Interactive 3D Cursor Physics (Rotate, Move & Zoom on Hover)
+    const visualWrap = $(".hero__visual-wrap");
+    const globeStage = $(".hero__globe-stage");
+
+    if (visualWrap && globeStage && window.matchMedia("(pointer: fine)").matches) {
+      let isInteracting = false;
+      let targetRotX = 0;
+      let targetRotY = 0;
+      let targetTransX = 0;
+      let targetTransY = 0;
+      let currentRotX = 0;
+      let currentRotY = 0;
+      let currentTransX = 0;
+      let currentTransY = 0;
+      let rafId = null;
+
+      function updateMotion() {
+        if (!isInteracting) return;
+        currentRotX += (targetRotX - currentRotX) * 0.1;
+        currentRotY += (targetRotY - currentRotY) * 0.1;
+        currentTransX += (targetTransX - currentTransX) * 0.1;
+        currentTransY += (targetTransY - currentTransY) * 0.1;
+
+        globeStage.style.transform = `perspective(1000px) translate3d(${currentTransX.toFixed(2)}px, ${currentTransY.toFixed(2)}px, 0) rotateX(${currentRotX.toFixed(2)}deg) rotateY(${currentRotY.toFixed(2)}deg) scale(1.03)`;
+        rafId = requestAnimationFrame(updateMotion);
+      }
+
+      visualWrap.addEventListener("mouseenter", () => {
+        isInteracting = true;
+        globeStage.classList.add("is-interactive");
+        cancelAnimationFrame(rafId);
+        rafId = requestAnimationFrame(updateMotion);
+      });
+
+      visualWrap.addEventListener("mousemove", (e) => {
+        const rect = visualWrap.getBoundingClientRect();
+        const normX = (e.clientX - rect.left) / rect.width - 0.5;
+        const normY = (e.clientY - rect.top) / rect.height - 0.5;
+
+        targetRotY = normX * 14;
+        targetRotX = -normY * 14;
+        targetTransX = normX * 18;
+        targetTransY = normY * 18;
+      });
+
+      visualWrap.addEventListener("mouseleave", () => {
+        isInteracting = false;
+        cancelAnimationFrame(rafId);
+        globeStage.style.transform = "";
+        globeStage.classList.remove("is-interactive");
+      });
+    }
   }
 
   /* ==========================================================================
