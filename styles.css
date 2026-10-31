@@ -2651,3 +2651,20 @@ code,
   border-color: var(--violet);
   box-shadow: 0 10px 24px -6px rgba(120, 86, 255, 0.16);
 }
+
+/* --- Suppress Netlify Injected Badge / HUD Frame --- */
+#nl-badge-frame,
+#nl-hud-frame,
+iframe[title*="Netlify"],
+iframe[id^="nl-"] {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  width: 0 !important;
+  height: 0 !important;
+  position: absolute !important;
+  clip: rect(0, 0, 0, 0) !important;
+  clip-path: inset(100%) !important;
+  z-index: -999999 !important;
+}

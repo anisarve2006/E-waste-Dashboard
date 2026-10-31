@@ -21,7 +21,20 @@
       if (savedTheme === 'light' || savedTheme === 'dark') {
         document.documentElement.dataset.theme = savedTheme;
       }
+      // Suppress Netlify "Powered by Netlify" HUD badge
+      localStorage.setItem("nl-hud:public:v1", "hidden");
+      localStorage.setItem("nl-hud:owner-private:v1", "hidden");
     } catch (e) {}
+
+    // Auto-remove any Netlify badge iframe if injected by edge proxy
+    new MutationObserver(function() {
+      const badge = document.getElementById("nl-badge-frame") || 
+                    document.getElementById("nl-hud-frame") || 
+                    document.querySelector('iframe[title*="Netlify"]');
+      if (badge) {
+        badge.remove();
+      }
+    }).observe(document.documentElement, { childList: true, subtree: true });
   </script>
 </head>
 <body>
