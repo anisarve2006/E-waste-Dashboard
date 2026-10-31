@@ -71,22 +71,9 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   /* ==========================================================================
-     2. 3D Sustainability Globe Hotspots & Interactive Kinetic Physics
+     2. 3D Sustainability Globe Interactive Kinetic Physics
      ========================================================================== */
-  function initGlobeHotspots() {
-    $$(".globe-spot").forEach((spot) => {
-      const id = Number(spot.dataset.id);
-      spot.addEventListener("click", () => {
-        openModal(id);
-      });
-      spot.addEventListener("keydown", (e) => {
-        if (e.key === "Enter" || e.key === " ") {
-          e.preventDefault();
-          openModal(id);
-        }
-      });
-    });
-
+  function initGlobeMotion() {
     // Interactive 3D Cursor Physics (Rotate, Move & Zoom on Hover)
     const visualWrap = $(".hero__visual-wrap");
     const globeStage = $(".hero__globe-stage");
@@ -805,7 +792,7 @@ document.addEventListener("DOMContentLoaded", () => {
   /* ==========================================================================
      10. Initialize All Modules
      ========================================================================== */
-  initGlobeHotspots();
+  initGlobeMotion();
   renderArchive();
   renderTimeline();
   renderLiveProjects();
