@@ -1,0 +1,640 @@
+/**
+ * EWEM Dashboard — Application Logic
+ * Interactive Circuit Visualizer, Reactive Filtering, Modal Manager, and Timeline Engine
+ */
+
+document.addEventListener("DOMContentLoaded", () => {
+  "use strict";
+
+  // Helpers
+  const $ = (selector, context = document) => context.querySelector(selector);
+  const $$ = (selector, context = document) => Array.from(context.querySelectorAll(selector));
+  const pad = (num) => String(num).padStart(2, "0");
+
+  // State
+  const state = {
+    type: "all",
+    theme: "all",
+    query: "",
+    currentModalId: 0
+  };
+
+  // Map theme assignments for quick lookup
+  const themeMap = new Map();
+  THEMES.forEach((theme) => {
+    theme.assignments.forEach((id) => themeMap.set(id, theme.id));
+  });
+
+  /* ==========================================================================
+     1. Theme Toggle & Scroll Progress
+     ========================================================================== */
+  const html = document.documentElement;
+  const themeToggle = $("#themeToggle");
+  const scrollProgress = $("#scrollProgress");
+
+  if (themeToggle) {
+    themeToggle.addEventListener("click", () => {
+      const current = html.dataset.theme;
+      const next = current === "dark" ? "light" : "dark";
+      html.dataset.theme = next;
+      localStorage.setItem("ewem-theme", next);
+    });
+  }
+
+  // Scroll Progress Handler
+  window.addEventListener("scroll", () => {
+    const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+    const scrolled = docHeight > 0 ? (window.scrollY / docHeight) * 100 : 0;
+    if (scrollProgress) {
+      scrollProgress.style.width = `${scrolled}%`;
+    }
+  }, { passive: true });
+
+  // Mobile menu toggle
+  const mobileNavToggle = $("#mobileNavToggle");
+  const siteNav = $("#siteNav");
+  if (mobileNavToggle && siteNav) {
+    mobileNavToggle.addEventListener("click", () => {
+      siteNav.classList.toggle("is-mobile-open");
+    });
+    $$(".site-nav a").forEach((a) => {
+      a.addEventListener("click", () => siteNav.classList.remove("is-mobile-open"));
+    });
+  }
+
+  /* ==========================================================================
+     2. 3D Sustainability Globe Hotspots
+     ========================================================================== */
+  function initGlobeHotspots() {
+    $$(".globe-spot").forEach((spot) => {
+      const id = Number(spot.dataset.id);
+      spot.addEventListener("click", () => {
+        openModal(id);
+      });
+      spot.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          openModal(id);
+        }
+      });
+    });
+  }
+
+  /* ==========================================================================
+     3. Project Archive Rendering & Reactive Filtering
+     ========================================================================== */
+  const archiveGrid = $("#archiveGrid");
+  const filterCount = $("#filterCount");
+  const emptyState = $("#emptyState");
+  const searchInput = $("#archiveSearch");
+  const filterReset = $("#filterReset");
+  const emptyReset = $("#emptyReset");
+
+  function matchesFilter(item) {
+    // Assessment filter
+    if (state.type !== "all" && item.type.toLowerCase() !== state.type) {
+      return false;
+    }
+
+    // Theme filter
+    if (state.theme !== "all") {
+      const itemTheme = themeMap.get(item.id);
+      if (itemTheme !== state.theme) {
+        return false;
+      }
+    }
+
+    // Query search
+    if (state.query.trim()) {
+      const q = state.query.toLowerCase().trim();
+      const searchable = [
+        item.title,
+        item.kicker,
+        item.description,
+        ...(item.tags || []),
+        ...(item.group || []),
+        ...item.files.map((f) => `${f.label} ${f.kind} ${f.meta || ""}`)
+      ].join(" ").toLowerCase();
+
+      if (!searchable.includes(q)) {
+        return false;
+      }
+    }
+
+    return true;
+  }
+
+  function renderArchive() {
+    if (!archiveGrid) return;
+
+    const filtered = ASSIGNMENTS.filter(matchesFilter);
+
+    if (filterCount) {
+      filterCount.textContent = filtered.length;
+    }
+
+    if (filtered.length === 0) {
+      archiveGrid.innerHTML = "";
+      if (emptyState) emptyState.style.display = "block";
+      return;
+    }
+
+    if (emptyState) emptyState.style.display = "none";
+
+    archiveGrid.innerHTML = filtered.map((item) => {
+      const hasLiveLink = item.files.some((f) => f.kind === "LINK");
+      const fileCount = item.files.filter((f) => f.kind !== "LINK").length;
+      const isIsa = item.type === "ISA";
+
+      return `
+        <article class="card" data-id="${item.id}" role="button" tabindex="0" aria-label="View ${item.title}">
+          <div class="card__cover-wrap">
+            <img class="card__cover-img" src="${item.cover.src}" alt="${item.cover.alt}" loading="lazy" 
+                 onerror="this.onerror=null; this.src='https://preet8808.github.io/preet-ewem-dashboard/${item.cover.src}';" />
+            <div class="card__badges">
+              <span class="badge-id">${pad(item.id)}</span>
+              <span class="badge-type ${isIsa ? 'badge-type--isa' : 'badge-type--ese'}">${item.type}</span>
+            </div>
+            <span class="card__open-pill">
+              <span>View Record</span>
+              <svg width="14" height="14" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M4 10h12M11 5l5 5-5 5"/>
+              </svg>
+            </span>
+          </div>
+
+          <div class="card__body">
+            <p class="card__kicker">${item.kicker}</p>
+            <h3 class="card__title">${item.title}</h3>
+            <p class="card__desc">${item.description}</p>
+            
+            <div class="card__tags">
+              ${item.tags.slice(0, 4).map((tag) => `<span class="tag-sticker">${tag}</span>`).join("")}
+            </div>
+
+            <div class="card__foot">
+              <span class="card__date">
+                <i class="status-dot" aria-hidden="true"></i>
+                <span>${item.dateLabel || 'In-Class'}</span>
+              </span>
+              <span>
+                ${fileCount > 0 ? `${fileCount} file${fileCount > 1 ? 's' : ''}` : ''}
+                ${hasLiveLink ? (fileCount > 0 ? ' · ' : '') + '⚡ Live App' : ''}
+              </span>
+            </div>
+          </div>
+        </article>
+      `;
+    }).join("");
+
+    // Attach click listeners to cards
+    $$(".card", archiveGrid).forEach((card) => {
+      const id = Number(card.dataset.id);
+      card.addEventListener("click", () => openModal(id));
+      card.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          openModal(id);
+        }
+      });
+    });
+  }
+
+  // Filter Event Listeners
+  $$("[data-filter-type]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      $$("[data-filter-type]").forEach((b) => b.classList.remove("is-active"));
+      btn.classList.add("is-active");
+      state.type = btn.dataset.filterType;
+      renderArchive();
+    });
+  });
+
+  $$("[data-filter-theme]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      $$("[data-filter-theme]").forEach((b) => b.classList.remove("is-active"));
+      btn.classList.add("is-active");
+      state.theme = btn.dataset.filterTheme;
+      renderArchive();
+    });
+  });
+
+  if (searchInput) {
+    searchInput.addEventListener("input", (e) => {
+      state.query = e.target.value;
+      renderArchive();
+    });
+  }
+
+  function resetAllFilters() {
+    state.type = "all";
+    state.theme = "all";
+    state.query = "";
+    if (searchInput) searchInput.value = "";
+    $$("[data-filter-type]").forEach((b) => b.classList.toggle("is-active", b.dataset.filterType === "all"));
+    $$("[data-filter-theme]").forEach((b) => b.classList.toggle("is-active", b.dataset.filterTheme === "all"));
+    renderArchive();
+  }
+
+  if (filterReset) filterReset.addEventListener("click", resetAllFilters);
+  if (emptyReset) emptyReset.addEventListener("click", resetAllFilters);
+
+  /* ==========================================================================
+     4. Sequence & Timeline Rendering
+     ========================================================================== */
+  const timelineTrack = $("#timelineTrack");
+
+  function renderTimeline() {
+    if (!timelineTrack) return;
+
+    // Group assignments by month
+    const months = [
+      { key: "2026-07", label: "Jul 2026", title: "State Baseline & Generation Ledgers" },
+      { key: "2026-08", label: "Aug 2026", title: "Capacity Gaps & Plasma Smelting Reactor" },
+      { key: "2026-09", label: "Sep 2026", title: "EPR Compliance, Green Buildings & SWaCH" },
+      { key: "2026-10", label: "Oct 2026", title: "AI Recommender Architecture & IEEE Paper" },
+      { key: null, label: "Core", title: "In-Class Foundational Blueprints" }
+    ];
+
+    timelineTrack.innerHTML = months.map((m) => {
+      const items = ASSIGNMENTS.filter((a) => a.date === m.key);
+      if (items.length === 0) return "";
+
+      return `
+        <div class="timeline-month-block">
+          <div class="timeline-month-header">
+            <div class="timeline-month-badge">${m.label.replace(" 2026", "")}</div>
+            <h3 class="timeline-month-title">${m.title}</h3>
+          </div>
+
+          <div class="timeline-items-list">
+            ${items.map((item) => `
+              <div class="timeline-item-card" data-id="${item.id}" role="button" tabindex="0">
+                <div class="timeline-item-info">
+                  <span class="timeline-item-kicker">${item.type} ${pad(item.id)} · ${item.kicker}</span>
+                  <h4 class="timeline-item-title">${item.title}</h4>
+                  <div class="timeline-item-tags">
+                    ${item.tags.slice(0, 3).map((t) => `<span>#${t}</span>`).join(" · ")}
+                  </div>
+                </div>
+                <div class="btn btn--ghost" style="padding: 0.5rem 0.9rem; font-size: 0.82rem;">
+                  Open Record →
+                </div>
+              </div>
+            `).join("")}
+          </div>
+        </div>
+      `;
+    }).join("");
+
+    $$(".timeline-item-card", timelineTrack).forEach((card) => {
+      const id = Number(card.dataset.id);
+      card.addEventListener("click", () => openModal(id));
+      card.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          openModal(id);
+        }
+      });
+    });
+  }
+
+  /* ==========================================================================
+     5. Live Projects Grid Rendering
+     ========================================================================== */
+  const liveProjectsGrid = $("#liveProjectsGrid");
+
+  function renderLiveProjects() {
+    if (!liveProjectsGrid) return;
+
+    liveProjectsGrid.innerHTML = PROJECTS.map((p) => `
+      <article class="live-card live-card--${p.accent}">
+        <div>
+          <div class="live-card__head">
+            <span class="live-card__cat">${p.category}</span>
+            <span class="live-card__badge">${p.badge}</span>
+          </div>
+
+          <h3 class="live-card__title" style="margin-top: 0.85rem;">${p.title}</h3>
+          <p class="live-card__subtitle">${p.subtitle}</p>
+          <p class="live-card__desc" style="margin-top: 0.75rem;">${p.description}</p>
+        </div>
+
+        <div>
+          <div class="live-card__stats" style="margin-bottom: 1.25rem;">
+            <span>⚡ ${p.stats}</span>
+          </div>
+          <a class="live-card__btn" href="${p.url}" target="_blank" rel="noopener noreferrer">
+            <span>${p.cta}</span>
+            <svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M5 15 15 5M7 5h8v8"/>
+            </svg>
+          </a>
+        </div>
+      </article>
+    `).join("");
+  }
+
+  /* ==========================================================================
+     6. Themes Section Rendering
+     ========================================================================== */
+  const themesGrid = $("#themesGrid");
+
+  function renderThemes() {
+    if (!themesGrid) return;
+
+    themesGrid.innerHTML = THEMES.map((theme) => `
+      <div class="theme-card theme-card--${theme.colorToken}">
+        <span class="theme-card__num">${theme.number}</span>
+        <div>
+          <span class="theme-card__tagline">${theme.tagline}</span>
+          <h3 class="theme-card__title">${theme.title}</h3>
+        </div>
+        <p class="theme-card__desc">${theme.description}</p>
+        
+        <div style="background: var(--canvas-alt); padding: 0.75rem; border-radius: var(--radius-sm); font-size: 0.82rem; color: var(--ink-secondary);">
+          <strong>Key Takeaway:</strong> ${theme.keyInsight}
+        </div>
+
+        <div class="theme-card__pills">
+          ${theme.assignments.map((id) => {
+            const item = ASSIGNMENTS.find((a) => a.id === id);
+            if (!item) return "";
+            return `
+              <button class="theme-pill-chip" type="button" data-modal-id="${item.id}">
+                ${item.type} ${pad(item.id)}: ${item.title.split(" ")[0]}
+              </button>
+            `;
+          }).join("")}
+        </div>
+      </div>
+    `).join("");
+
+    $$(".theme-pill-chip", themesGrid).forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const id = Number(btn.dataset.modalId);
+        openModal(id);
+      });
+    });
+  }
+
+  /* ==========================================================================
+     7. Resource & Evidence Library Table
+     ========================================================================== */
+  const resourcesTableBody = $("#resourcesTableBody");
+
+  function renderResourceLibrary() {
+    if (!resourcesTableBody) return;
+
+    const allFiles = [];
+    ASSIGNMENTS.forEach((item) => {
+      item.files.forEach((f) => {
+        allFiles.push({
+          ...f,
+          assignmentId: item.id,
+          assignmentTitle: item.title,
+          assignmentType: item.type
+        });
+      });
+    });
+
+    resourcesTableBody.innerHTML = allFiles.map((file) => {
+      const isLink = file.kind === "LINK";
+      const kindClass = `file-kind--${file.kind.toLowerCase()}`;
+      const isBrowserViewable = ["PDF", "JPEG", "MP4"].includes(file.kind);
+
+      const actionHtml = isLink ? `
+        <a class="btn-action btn-action--link" href="${file.url}" target="_blank" rel="noopener noreferrer">
+          <span>Launch Tool</span>
+          <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 15 15 5M7 5h8v8"/></svg>
+        </a>
+      ` : `
+        <div class="table-actions">
+          <a class="btn-action btn-action--primary" href="${file.path}" target="_blank" rel="noopener noreferrer" title="Open or preview document">
+            <span>${isBrowserViewable ? 'View ↗' : 'Open ↗'}</span>
+          </a>
+          <a class="btn-action btn-action--secondary" href="${file.path}" download title="Download ${file.label}">
+            <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 3v10m0 0l-4-4m4 4l4-4M4 17h12"/></svg>
+            <span>Download</span>
+          </a>
+        </div>
+      `;
+
+      return `
+        <tr>
+          <td>
+            <strong>${file.label}</strong>
+            ${file.note ? `<br><small style="color: var(--muted);">${file.note}</small>` : ''}
+          </td>
+          <td>
+            <button class="link-button" type="button" onclick="document.dispatchEvent(new CustomEvent('open-assignment', { detail: ${file.assignmentId} }))" 
+                    style="color: var(--violet); font-weight: 600; text-align: left; cursor: pointer;">
+              ${file.assignmentType} ${pad(file.assignmentId)} · ${file.assignmentTitle}
+            </button>
+          </td>
+          <td>
+            <span class="file-kind-badge ${kindClass}">${file.kind}</span>
+          </td>
+          <td style="font-family: var(--font-mono); font-size: 0.8rem; color: var(--muted);">
+            ${file.meta || 'Live Cloud Asset'}
+          </td>
+          <td>
+            ${actionHtml}
+          </td>
+        </tr>
+      `;
+    }).join("");
+  }
+
+  document.addEventListener("open-assignment", (e) => {
+    openModal(e.detail);
+  });
+
+  /* ==========================================================================
+     8. Detail Modal Manager
+     ========================================================================== */
+  const modal = $("#detailModal");
+  const modalClose = $("#modalClose");
+  const modalCover = $("#modalCover");
+  const modalId = $("#modalId");
+  const modalType = $("#modalType");
+  const modalDate = $("#modalDate");
+  const modalStatus = $("#modalStatus");
+  const modalKicker = $("#modalKicker");
+  const modalTitle = $("#modalTitle");
+  const modalDesc = $("#modalDesc");
+  const modalMetricsBox = $("#modalMetricsBox");
+  const modalVideoWrap = $("#modalVideoWrap");
+  const modalVideo = $("#modalVideo");
+  const modalFilesList = $("#modalFilesList");
+  const modalPrevBtn = $("#modalPrevBtn");
+  const modalNextBtn = $("#modalNextBtn");
+
+  function openModal(id) {
+    const item = ASSIGNMENTS.find((a) => a.id === id);
+    if (!item || !modal) return;
+
+    state.currentModalId = id;
+
+    // Cover image
+    if (modalCover) {
+      modalCover.src = item.cover.src;
+      modalCover.alt = item.cover.alt;
+      modalCover.onerror = () => {
+        modalCover.src = `https://preet8808.github.io/preet-ewem-dashboard/${item.cover.src}`;
+      };
+    }
+
+    // Header Meta
+    if (modalId) modalId.textContent = pad(item.id);
+    if (modalType) {
+      modalType.textContent = item.type;
+      modalType.className = `badge-type ${item.type === 'ISA' ? 'badge-type--isa' : 'badge-type--ese'}`;
+    }
+    if (modalDate) modalDate.textContent = item.dateLabel || "In-Class Core";
+    if (modalStatus) modalStatus.textContent = item.status || "Submitted";
+
+    if (modalKicker) modalKicker.textContent = item.kicker;
+    if (modalTitle) modalTitle.textContent = item.title;
+    if (modalDesc) modalDesc.textContent = item.description;
+
+    // Key metrics callout box
+    if (modalMetricsBox) {
+      if (item.keyMetrics && item.keyMetrics.length > 0) {
+        modalMetricsBox.style.display = "grid";
+        modalMetricsBox.innerHTML = item.keyMetrics.map((km) => `
+          <div class="modal-metric-item">
+            <span class="modal-metric-label">${km.label}</span>
+            <span class="modal-metric-val">${km.value}</span>
+          </div>
+        `).join("");
+      } else {
+        modalMetricsBox.style.display = "none";
+      }
+    }
+
+    // Video Player check (e.g. for E-Waste Week A07)
+    const videoFile = item.files.find((f) => f.video);
+    if (modalVideoWrap && modalVideo) {
+      if (videoFile) {
+        modalVideoWrap.style.display = "block";
+        modalVideo.src = videoFile.path || videoFile.remoteUrl;
+      } else {
+        modalVideoWrap.style.display = "none";
+        modalVideo.pause();
+        modalVideo.removeAttribute("src");
+      }
+    }
+
+    // Files list
+    if (modalFilesList) {
+      modalFilesList.innerHTML = item.files.map((f) => {
+        const isLink = f.kind === "LINK";
+        const isBrowserViewable = ["PDF", "JPEG", "MP4"].includes(f.kind);
+
+        const actionsHtml = isLink ? `
+          <a class="btn-action btn-action--link" href="${f.url}" target="_blank" rel="noopener noreferrer">
+            <span>Launch Tool</span>
+            <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 15 15 5M7 5h8v8"/></svg>
+          </a>
+        ` : `
+          <div class="table-actions">
+            <a class="btn-action btn-action--primary" href="${f.path}" target="_blank" rel="noopener noreferrer">
+              <span>${isBrowserViewable ? 'View ↗' : 'Open ↗'}</span>
+            </a>
+            <a class="btn-action btn-action--secondary" href="${f.path}" download title="Download ${f.label}">
+              <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 3v10m0 0l-4-4m4 4l4-4M4 17h12"/></svg>
+              <span>Download</span>
+            </a>
+          </div>
+        `;
+
+        return `
+          <div class="modal-file-row">
+            <div class="modal-file-info">
+              <span class="file-kind-badge file-kind--${f.kind.toLowerCase()}">${f.kind}</span>
+              <div>
+                <strong style="font-size: 0.92rem; display: block;">${f.label}</strong>
+                <small style="color: var(--muted); font-family: var(--font-mono); font-size: 0.76rem;">
+                  ${f.meta || f.note || 'Available Resource'}
+                </small>
+              </div>
+            </div>
+
+            <div class="modal-file-actions">
+              ${actionsHtml}
+            </div>
+          </div>
+        `;
+      }).join("");
+    }
+
+    // Open Modal
+    modal.classList.add("is-open");
+    document.body.style.overflow = "hidden";
+  }
+
+  function closeModal() {
+    if (!modal) return;
+    modal.classList.remove("is-open");
+    document.body.style.overflow = "";
+    if (modalVideo) {
+      modalVideo.pause();
+    }
+  }
+
+  if (modalClose) modalClose.addEventListener("click", closeModal);
+  if (modal) {
+    modal.addEventListener("click", (e) => {
+      if (e.target === modal) closeModal();
+    });
+  }
+
+  // Previous & Next navigation
+  if (modalPrevBtn) {
+    modalPrevBtn.addEventListener("click", () => {
+      const prevId = (state.currentModalId - 1 + ASSIGNMENTS.length) % ASSIGNMENTS.length;
+      openModal(prevId);
+    });
+  }
+
+  if (modalNextBtn) {
+    modalNextBtn.addEventListener("click", () => {
+      const nextId = (state.currentModalId + 1) % ASSIGNMENTS.length;
+      openModal(nextId);
+    });
+  }
+
+  // Keyboard controls
+  window.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && modal && modal.classList.contains("is-open")) {
+      closeModal();
+    }
+    if (modal && modal.classList.contains("is-open")) {
+      if (e.key === "ArrowLeft") {
+        const prevId = (state.currentModalId - 1 + ASSIGNMENTS.length) % ASSIGNMENTS.length;
+        openModal(prevId);
+      }
+      if (e.key === "ArrowRight") {
+        const nextId = (state.currentModalId + 1) % ASSIGNMENTS.length;
+        openModal(nextId);
+      }
+    }
+    // Press '/' to search
+    if (e.key === "/" && document.activeElement !== searchInput) {
+      e.preventDefault();
+      if (searchInput) searchInput.focus();
+    }
+  });
+
+  /* ==========================================================================
+     9. Initialize All Modules
+     ========================================================================== */
+  initGlobeHotspots();
+  renderArchive();
+  renderTimeline();
+  renderLiveProjects();
+  renderThemes();
+  renderResourceLibrary();
+});
+

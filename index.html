@@ -1,0 +1,415 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>EWEM Dashboard — Electronic Waste & Environmental Management Archive</title>
+  <meta name="description" content="Semester 5 E-Waste Management portfolio & project archive: 11 ISA & ESE submissions on e-waste evidence, plasma-arc recovery, and circular adoption — featuring 4 live tools and complete documentation.">
+  <meta name="author" content="EWEM Engineering Team">
+  <meta name="theme-color" content="#F7F3EA">
+
+  <!-- Fonts: Space Grotesk (Headings), Inter (Body), IBM Plex Mono (Code/Metadata) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;1,400&family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="styles.css">
+  <script>
+    // Theme initialization before rendering to avoid flash
+    try {
+      const savedTheme = localStorage.getItem('ewem-theme');
+      if (savedTheme === 'light' || savedTheme === 'dark') {
+        document.documentElement.dataset.theme = savedTheme;
+      }
+    } catch (e) {}
+  </script>
+</head>
+<body>
+  <!-- Skip navigation link for accessibility -->
+  <a class="skip-link" href="#archive">Skip to submissions archive</a>
+  
+  <!-- Scroll indicator bar -->
+  <div class="scroll-progress" id="scrollProgress" aria-hidden="true"></div>
+
+  <!-- Persistent Sticky Header -->
+  <header class="site-head" id="siteHead">
+    <div class="site-head__inner">
+      <a class="brand" href="#top" aria-label="EWEM Dashboard — Back to top">
+        <span class="brand__mark" aria-hidden="true">EW</span>
+        <div class="brand__text">
+          <span class="brand__title">EWEM Archive</span>
+          <span class="brand__subtitle">Semester 05 · VEC02</span>
+        </div>
+      </a>
+
+      <nav class="site-nav" id="siteNav" aria-label="Main Navigation">
+        <a href="#archive">Archive</a>
+        <a href="#timeline">Timeline</a>
+        <a href="#live">Live Tools</a>
+        <a href="#themes">Themes</a>
+        <a href="#resources">Library</a>
+      </nav>
+
+      <div class="site-head__actions">
+        <button class="theme-toggle" id="themeToggle" type="button" aria-label="Toggle theme">
+          <svg class="theme-toggle__sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="4"/>
+            <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/>
+          </svg>
+          <svg class="theme-toggle__moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/>
+          </svg>
+        </button>
+        <a class="btn-github" href="https://github.com" target="_blank" rel="noopener noreferrer">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/>
+          </svg>
+          <span>Repository</span>
+        </a>
+        <button class="mobile-nav-toggle" id="mobileNavToggle" type="button" aria-label="Toggle navigation menu">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="3" y1="12" x2="21" y2="12"></line>
+            <line x1="3" y1="6" x2="21" y2="6"></line>
+            <line x1="3" y1="18" x2="21" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main id="top">
+    <!-- Hero Section -->
+    <section class="hero" aria-labelledby="heroTitle">
+      <div class="hero__grid">
+        <div class="hero__content">
+          <div class="hero__eyebrow">
+            <span class="hero__eyebrow-dot" aria-hidden="true"></span>
+            <span>Electronic Waste &amp; Environmental Management · Sem 5</span>
+          </div>
+
+          <h1 class="hero__title" id="heroTitle">
+            Eleven submissions.<br>
+            <span class="highlight-violet">One connected</span><br>
+            sustainability stack.
+          </h1>
+
+          <p class="hero__description">
+            A semester archive of evidence, urban mining recovery, and circular adoption — state e-waste ledgers, 
+            plasma-arc thermal smelting, EPR compliance reviews, a campus activation, and four deployed interactive web applications.
+          </p>
+
+          <div class="hero__actions">
+            <a class="btn btn--violet" href="#archive">
+              Explore Archive
+              <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M4 10h12M11 5l5 5-5 5"/>
+              </svg>
+            </a>
+            <a class="btn btn--lime" href="#live">View Live Tools</a>
+            <a class="btn btn--ghost" href="#timeline">Timeline</a>
+          </div>
+
+          <!-- Verified Metrics Cards -->
+          <div class="hero__metrics">
+            <div class="metric-card">
+              <span class="metric-card__num" id="metricSubmissions">11</span>
+              <span class="metric-card__label">Submissions</span>
+            </div>
+            <div class="metric-card">
+              <span class="metric-card__num" id="metricTools">4</span>
+              <span class="metric-card__label">Live Web Tools</span>
+            </div>
+            <div class="metric-card">
+              <span class="metric-card__num" id="metricThemes">3</span>
+              <span class="metric-card__label">Core Pillars</span>
+            </div>
+            <div class="metric-card">
+              <span class="metric-card__num">05</span>
+              <span class="metric-card__label">Semester</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3D Sustainability Globe Hero Visual -->
+        <div class="hero__visual-wrap">
+          <div class="hero__globe-stage">
+            <img class="hero__globe-img" src="assets/hero-image.png" alt="EWEM 3D Sustainability Globe with 11 Orbital Submissions" />
+            
+            <!-- Interactive Hotspot Overlays for Orbital Cards -->
+            <div class="globe-hotspots" aria-label="Interactive Orbital Cards">
+              <button class="globe-spot spot-01" data-id="1" type="button" aria-label="01 MP E-Waste Ledger" title="01 MP E-Waste Ledger"></button>
+              <button class="globe-spot spot-02" data-id="2" type="button" aria-label="02 Elemental Blueprint" title="02 Elemental Blueprint"></button>
+              <button class="globe-spot spot-03" data-id="3" type="button" aria-label="03 Kerala Landscape" title="03 Kerala Landscape"></button>
+              <button class="globe-spot spot-04" data-id="4" type="button" aria-label="04 Plasma Arc Recovery" title="04 Plasma Arc Recovery"></button>
+              <button class="globe-spot spot-05" data-id="5" type="button" aria-label="05 EPR Compliance Review" title="05 EPR Compliance Review"></button>
+              <button class="globe-spot spot-06" data-id="6" type="button" aria-label="06 Policy Briefing" title="06 Policy Briefing"></button>
+              <button class="globe-spot spot-07" data-id="7" type="button" aria-label="07 E-Waste Week" title="07 E-Waste Week"></button>
+              <button class="globe-spot spot-08" data-id="8" type="button" aria-label="08 Green Building Scorecard" title="08 Green Building Scorecard"></button>
+              <button class="globe-spot spot-09" data-id="9" type="button" aria-label="09 Pune's SWaCH Model" title="09 Pune's SWaCH Model"></button>
+              <button class="globe-spot spot-10" data-id="10" type="button" aria-label="10 Cartify" title="10 Cartify"></button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Marquee Statistics Ticker -->
+    <div class="ticker" aria-hidden="true">
+      <div class="ticker__track" id="tickerTrack">
+        <div class="ticker__item"><span class="ticker__badge ticker__badge--lime">LEDGER</span> 43,575 Tonnes/yr E-Waste Tracked across 20 MP Districts</div>
+        <div class="ticker__item"><span class="ticker__badge ticker__badge--coral">RECOVERY</span> 5,000–15,000°C Plasma Arc Smelting of PCBs with >95% Yield</div>
+        <div class="ticker__item"><span class="ticker__badge ticker__badge--cyan">KERALA</span> 75.83% Material Recovery Rate with 77.6% Formal Capacity Gap</div>
+        <div class="ticker__item"><span class="ticker__badge ticker__badge--lime">EPR 2022</span> Regulatory Audits for Dixon, Kaynes, Foxconn, Syrma SGS &amp; Tata</div>
+        <div class="ticker__item"><span class="ticker__badge ticker__badge--coral">CIRCULAR</span> 3,800+ Waste-Pickers Formally Integrated in Pune SWaCH Model</div>
+        <div class="ticker__item"><span class="ticker__badge ticker__badge--cyan">LEED</span> 10 Landmark Indian Green Facilities Benchmarked Across 6 Criteria</div>
+        <div class="ticker__item"><span class="ticker__badge ticker__badge--lime">RESEARCH</span> Cartify Recommender Fusion beats NCF (HR@10 0.327 vs 0.260)</div>
+      </div>
+    </div>
+
+    <!-- Section 1: Project Archive -->
+    <section class="section" id="archive" aria-labelledby="archiveHeading">
+      <div class="section__header">
+        <div class="section__eyebrow">
+          <span>01 / ARCHIVE</span>
+          <span>Verified Records</span>
+        </div>
+        <h2 class="section__title" id="archiveHeading">Every Submission, One Shelf.</h2>
+        <p class="section__subtitle">
+          Four ISA and seven ESE assignments, preserved as submitted. Filter by assessment type, thematic pillar, 
+          or search across keywords, technologies, and materials.
+        </p>
+      </div>
+
+      <!-- Controls & Filter Bar -->
+      <div class="filters-bar">
+        <div class="filters-row">
+          <div class="filters-group" role="group" aria-label="Filter by assessment type">
+            <span class="filter-label">Assessment</span>
+            <button class="pill-btn is-active" type="button" data-filter-type="all">All <span class="pill-count">11</span></button>
+            <button class="pill-btn" type="button" data-filter-type="isa">ISA <span class="pill-count">4</span></button>
+            <button class="pill-btn" type="button" data-filter-type="ese">ESE <span class="pill-count">7</span></button>
+          </div>
+
+          <div class="filters-group" role="group" aria-label="Filter by theme">
+            <span class="filter-label">Theme</span>
+            <button class="pill-btn is-active" type="button" data-filter-theme="all">All</button>
+            <button class="pill-btn" type="button" data-filter-theme="evidence">Evidence <span class="pill-count">4</span></button>
+            <button class="pill-btn" type="button" data-filter-theme="recovery">Recovery <span class="pill-count">2</span></button>
+            <button class="pill-btn" type="button" data-filter-theme="adoption">Adoption <span class="pill-count">5</span></button>
+          </div>
+
+          <div class="search-box">
+            <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="8.5" cy="8.5" r="5.5"/>
+              <path d="m13 13 4.5 4.5"/>
+            </svg>
+            <input class="search-input" type="search" id="archiveSearch" placeholder="Search title, tags, or materials..." autocomplete="off">
+          </div>
+        </div>
+
+        <div class="filters-status">
+          <span>Showing <strong id="filterCount">11</strong> of 11 submissions</span>
+          <button class="btn-reset" id="filterReset" type="button">Reset Filters</button>
+        </div>
+      </div>
+
+      <!-- Archive Cards Grid -->
+      <div class="cards-grid" id="archiveGrid" aria-live="polite"></div>
+
+      <!-- Empty State -->
+      <div class="empty-state" id="emptyState">
+        <h3>No matching submissions found</h3>
+        <p>No records match your active search or filters. <button class="btn-reset" id="emptyReset" type="button">Clear filters</button> to view all eleven.</p>
+      </div>
+    </section>
+
+    <!-- Section 2: Sequence & Timeline -->
+    <section class="section" id="timeline" aria-labelledby="timelineHeading">
+      <div class="section__header">
+        <div class="section__eyebrow">
+          <span>02 / SEQUENCE</span>
+          <span>Semester Milestones</span>
+        </div>
+        <h2 class="section__title" id="timelineHeading">A Semester, Month by Month.</h2>
+        <p class="section__subtitle">
+          From curriculum baseline in July through thermal patents and AI recommender research in October.
+          Select any timeline milestone to inspect the underlying submission.
+        </p>
+      </div>
+
+      <div class="timeline-track" id="timelineTrack"></div>
+    </section>
+
+    <!-- Section 3: Live Projects Showcase -->
+    <section class="section" id="live" aria-labelledby="liveHeading">
+      <div class="section__header">
+        <div class="section__eyebrow">
+          <span>03 / DEPLOYMENTS</span>
+          <span>Public Web Tools</span>
+        </div>
+        <h2 class="section__title" id="liveHeading">Built to be Used, Not Just Submitted.</h2>
+        <p class="section__subtitle">
+          Four course submissions ship as live, production web applications accessible anywhere without login or setup.
+        </p>
+      </div>
+
+      <div class="live-grid" id="liveProjectsGrid"></div>
+    </section>
+
+    <!-- Section 4: Themes & Pillars -->
+    <section class="section" id="themes" aria-labelledby="themesHeading">
+      <div class="section__header">
+        <div class="section__eyebrow">
+          <span>04 / THEMATIC FRAMEWORK</span>
+          <span>Three Pillars</span>
+        </div>
+        <h2 class="section__title" id="themesHeading">Three Threads, Eleven Submissions.</h2>
+        <p class="section__subtitle">
+          The semester follows a continuous loop: first measure the physical problem, then recover high-value materials, 
+          then build the regulatory and economic architecture for mass adoption.
+        </p>
+      </div>
+
+      <div class="themes-grid" id="themesGrid"></div>
+    </section>
+
+    <!-- Section 5: Resource & Evidence Library -->
+    <section class="section" id="resources" aria-labelledby="resourcesHeading">
+      <div class="section__header">
+        <div class="section__eyebrow">
+          <span>05 / EVIDENCE VAULT</span>
+          <span>Documents &amp; Datasets</span>
+        </div>
+        <h2 class="section__title" id="resourcesHeading">Resource &amp; Evidence Library.</h2>
+        <p class="section__subtitle">
+          Every submission links to verified documents: formal state reports (DOCX), 7-sheet analytical spreadsheets (XLSX),
+          conference slide decks (PPTX), IEEE papers (PDF), and high-resolution posters (JPEG).
+        </p>
+      </div>
+
+      <div class="resources-table-wrap">
+        <table class="resources-table" aria-label="Downloadable resource documents table">
+          <thead>
+            <tr>
+              <th scope="col">Document Title</th>
+              <th scope="col">Submission</th>
+              <th scope="col">Type</th>
+              <th scope="col">Details</th>
+              <th scope="col">Access</th>
+            </tr>
+          </thead>
+          <tbody id="resourcesTableBody"></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <!-- Detail Modal -->
+  <div class="modal-overlay" id="detailModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modal-dialog">
+      <button class="modal-close-btn" id="modalClose" type="button" aria-label="Close modal">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+
+      <img class="modal-cover" id="modalCover" src="" alt="">
+
+      <div class="modal-content">
+        <div class="modal-header-meta">
+          <span class="badge-id" id="modalId">00</span>
+          <span class="badge-type" id="modalType">ISA</span>
+          <span class="tag-sticker" id="modalDate">Jul 2026</span>
+          <span class="tag-sticker" id="modalStatus">Submitted</span>
+        </div>
+
+        <p class="card__kicker" id="modalKicker">Kicker text</p>
+        <h2 class="modal-title" id="modalTitle">Submission Title</h2>
+        <p class="modal-desc" id="modalDesc">Detailed description goes here.</p>
+
+        <!-- Dynamic Key Metrics Box -->
+        <div class="modal-metrics-box" id="modalMetricsBox"></div>
+
+        <!-- HTML5 Video Player Container (if video exists) -->
+        <div class="modal-video-wrap" id="modalVideoWrap" style="display: none;">
+          <video class="modal-video-player" id="modalVideo" controls preload="metadata"></video>
+        </div>
+
+        <!-- Files & Links Section -->
+        <div class="modal-files-section">
+          <h3 class="modal-files-title">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+              <line x1="16" y1="13" x2="8" y2="13"></line>
+              <line x1="16" y1="17" x2="8" y2="17"></line>
+              <polyline points="10 9 9 9 8 9"></polyline>
+            </svg>
+            Available Files &amp; Live Links
+          </h3>
+          <div class="modal-files-list" id="modalFilesList"></div>
+        </div>
+
+        <!-- Navigation Buttons -->
+        <div class="modal-nav">
+          <button class="btn btn--ghost" id="modalPrevBtn" type="button">
+            <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M16 10H4M9 15l-5-5 5-5"/>
+            </svg>
+            Previous
+          </button>
+          <button class="btn btn--ghost" id="modalNextBtn" type="button">
+            Next
+            <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M4 10h12M11 5l5 5-5 5"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Persistent Footer -->
+  <footer class="site-foot">
+    <div class="site-foot__inner">
+      <div class="site-foot__brand">
+        <span class="site-foot__title">EWEM Engineering Archive</span>
+        <p class="site-foot__desc">
+          Electronic Waste &amp; Environmental Management (Course Code: VEC02) · Third Year Computer Engineering (TE CMPN A) · 
+          Vidyalankar Institute of Technology, Mumbai · Academic Year 2026–27.
+        </p>
+      </div>
+
+      <div class="site-foot__nav">
+        <div class="site-foot__col">
+          <span class="site-foot__col-title">Navigation</span>
+          <a href="#archive">Archive</a>
+          <a href="#timeline">Timeline</a>
+          <a href="#live">Live Tools</a>
+          <a href="#themes">Themes</a>
+          <a href="#resources">Documents</a>
+        </div>
+        <div class="site-foot__col">
+          <span class="site-foot__col-title">Pillars</span>
+          <a href="#themes">01 Evidence</a>
+          <a href="#themes">02 Recovery</a>
+          <a href="#themes">03 Adoption</a>
+          <a href="https://github.com" target="_blank" rel="noopener noreferrer">Source Repo</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="site-foot__bottom">
+      <span>© 2026 EWEM Portfolio Dashboard · Playful, Modern, Technical</span>
+      <span>Evidence · Recovery · Adoption</span>
+      <a href="#top" style="color: var(--lime);">Back to top ↑</a>
+    </div>
+  </footer>
+
+  <!-- Core Scripts -->
+  <script src="data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
+
