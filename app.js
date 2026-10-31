@@ -41,12 +41,20 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // Scroll Progress Handler
+  // Scroll Progress & Sticky Header Scrolled State Handler
+  const siteHead = $("#siteHead");
   window.addEventListener("scroll", () => {
     const docHeight = document.documentElement.scrollHeight - window.innerHeight;
     const scrolled = docHeight > 0 ? (window.scrollY / docHeight) * 100 : 0;
     if (scrollProgress) {
       scrollProgress.style.width = `${scrolled}%`;
+    }
+    if (siteHead) {
+      if (window.scrollY > 20) {
+        siteHead.classList.add("is-scrolled");
+      } else {
+        siteHead.classList.remove("is-scrolled");
+      }
     }
   }, { passive: true });
 
@@ -200,7 +208,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const isIsa = item.type === "ISA";
 
       return `
-        <article class="card" data-id="${item.id}" role="button" tabindex="0" aria-label="View ${item.title}">
+        <article class="card reveal-init" data-id="${item.id}" role="button" tabindex="0" aria-label="View ${item.title}">
           <div class="card__cover-wrap">
             <img class="card__cover-img" src="${item.cover.src}" alt="${item.cover.alt}" loading="lazy" 
                  onerror="this.onerror=null; this.src='https://preet8808.github.io/preet-ewem-dashboard/${item.cover.src}';" />
@@ -251,6 +259,11 @@ document.addEventListener("DOMContentLoaded", () => {
         }
       });
     });
+
+    // Re-bind scroll reveal for newly rendered cards
+    if (typeof initScrollReveal === "function") {
+      initScrollReveal();
+    }
   }
 
   // Filter Event Listeners
@@ -314,7 +327,7 @@ document.addEventListener("DOMContentLoaded", () => {
       if (items.length === 0) return "";
 
       return `
-        <div class="timeline-month-block">
+        <div class="timeline-month-block reveal-init">
           <div class="timeline-month-header">
             <div class="timeline-month-badge">${m.label.replace(" 2026", "")}</div>
             <h3 class="timeline-month-title">${m.title}</h3>
@@ -361,7 +374,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!liveProjectsGrid) return;
 
     liveProjectsGrid.innerHTML = PROJECTS.map((p) => `
-      <article class="live-card live-card--${p.accent}">
+      <article class="live-card live-card--${p.accent} reveal-init">
         <div>
           <div class="live-card__head">
             <span class="live-card__cat">${p.category}</span>
@@ -397,7 +410,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!themesGrid) return;
 
     themesGrid.innerHTML = THEMES.map((theme) => `
-      <div class="theme-card theme-card--${theme.colorToken}">
+      <div class="theme-card theme-card--${theme.colorToken} reveal-init">
         <span class="theme-card__num">${theme.number}</span>
         <div>
           <span class="theme-card__tagline">${theme.tagline}</span>
@@ -705,7 +718,92 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   /* ==========================================================================
-     9. Initialize All Modules
+     9. Scroll Reveal, Spotlight Physics & Animated Metric Counters
+     ========================================================================== */
+  let revealObserver = null;
+
+  function initScrollReveal() {
+    // Attach reveal-init to section headers and ticker if not present
+    $$(".section__header, .resource-table-wrap, .ticker").forEach((el) => {
+      el.classList.add("reveal-init");
+    });
+
+    if (!("IntersectionObserver" in window)) {
+      $$(".reveal-init").forEach((el) => el.classList.add("is-revealed"));
+      return;
+    }
+
+    if (!revealObserver) {
+      revealObserver = new IntersectionObserver((entries, observer) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("is-revealed");
+            observer.unobserve(entry.target);
+          }
+        });
+      }, {
+        threshold: 0.08,
+        rootMargin: "0px 0px -40px 0px"
+      });
+    }
+
+    $$(".reveal-init:not(.is-revealed)").forEach((el) => {
+      revealObserver.observe(el);
+    });
+  }
+
+  // Interactive Cursor Spotlight Tracker for Cards
+  function initSpotlightTracker() {
+    if (!window.matchMedia("(pointer: fine)").matches) return;
+
+    document.addEventListener("pointermove", (e) => {
+      const card = e.target.closest(".card, .live-card, .theme-card, .metric-card, .timeline-item-card");
+      if (card) {
+        const rect = card.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        card.style.setProperty("--mouse-x", `${x}px`);
+        card.style.setProperty("--mouse-y", `${y}px`);
+      }
+    }, { passive: true });
+  }
+
+  // Hero Metric Count-Up Animation on Page Load
+  function initMetricCountUp() {
+    const metrics = [
+      { id: "metricSubmissions", target: 11 },
+      { id: "metricTools", target: 4 },
+      { id: "metricThemes", target: 3 }
+    ];
+
+    metrics.forEach(({ id, target }) => {
+      const el = $(`#${id}`);
+      if (!el) return;
+
+      const duration = 1400;
+      const startTime = performance.now();
+
+      function animateCount(now) {
+        const elapsed = now - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+        const easeOut = 1 - Math.pow(1 - progress, 3);
+        const current = Math.floor(easeOut * target);
+
+        el.textContent = current < 10 ? `0${current}` : `${current}`;
+
+        if (progress < 1) {
+          requestAnimationFrame(animateCount);
+        } else {
+          el.textContent = target < 10 ? `0${target}` : `${target}`;
+        }
+      }
+
+      requestAnimationFrame(animateCount);
+    });
+  }
+
+  /* ==========================================================================
+     10. Initialize All Modules
      ========================================================================== */
   initGlobeHotspots();
   renderArchive();
@@ -713,5 +811,8 @@ document.addEventListener("DOMContentLoaded", () => {
   renderLiveProjects();
   renderThemes();
   renderResourceLibrary();
+  initScrollReveal();
+  initSpotlightTracker();
+  initMetricCountUp();
 });
 
