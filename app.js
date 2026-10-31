@@ -463,10 +463,13 @@ document.addEventListener("DOMContentLoaded", () => {
   const modalKicker = $("#modalKicker");
   const modalTitle = $("#modalTitle");
   const modalDesc = $("#modalDesc");
+  const modalTags = $("#modalTags");
   const modalMetricsBox = $("#modalMetricsBox");
   const modalVideoWrap = $("#modalVideoWrap");
   const modalVideo = $("#modalVideo");
   const modalFilesList = $("#modalFilesList");
+  const modalFilesCount = $("#modalFilesCount");
+  const modalCounter = $("#modalCounter");
   const modalPrevBtn = $("#modalPrevBtn");
   const modalNextBtn = $("#modalNextBtn");
 
@@ -498,6 +501,22 @@ document.addEventListener("DOMContentLoaded", () => {
     if (modalTitle) modalTitle.textContent = item.title;
     if (modalDesc) modalDesc.textContent = item.description;
 
+    // Tags
+    if (modalTags) {
+      if (item.tags && item.tags.length > 0) {
+        modalTags.style.display = "flex";
+        modalTags.innerHTML = item.tags.map((t) => `<span class="tag-sticker">${t}</span>`).join("");
+      } else {
+        modalTags.style.display = "none";
+      }
+    }
+
+    // Modal Counter
+    if (modalCounter) {
+      const idx = ASSIGNMENTS.findIndex((a) => a.id === id);
+      modalCounter.textContent = `${pad(idx + 1)} / ${pad(ASSIGNMENTS.length)}`;
+    }
+
     // Key metrics callout box
     if (modalMetricsBox) {
       if (item.keyMetrics && item.keyMetrics.length > 0) {
@@ -528,6 +547,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Files list
     if (modalFilesList) {
+      const filesCount = item.files ? item.files.length : 0;
+      if (modalFilesCount) {
+        modalFilesCount.textContent = `${filesCount} ${filesCount === 1 ? 'Artifact' : 'Artifacts'}`;
+      }
+
       modalFilesList.innerHTML = item.files.map((f) => {
         const isLink = f.kind === "LINK";
         const isBrowserViewable = ["PDF", "JPEG", "MP4"].includes(f.kind);
@@ -554,7 +578,7 @@ document.addEventListener("DOMContentLoaded", () => {
             <div class="modal-file-info">
               <span class="file-kind-badge file-kind--${f.kind.toLowerCase()}">${f.kind}</span>
               <div>
-                <strong style="font-size: 0.92rem; display: block;">${f.label}</strong>
+                <strong style="font-size: 0.94rem; display: block; color: var(--ink);">${f.label}</strong>
                 <small style="color: var(--muted); font-family: var(--font-mono); font-size: 0.76rem;">
                   ${f.meta || f.note || 'Available Resource'}
                 </small>

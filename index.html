@@ -60,7 +60,7 @@
             <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/>
           </svg>
         </button>
-        <a class="btn-github" href="https://github.com" target="_blank" rel="noopener noreferrer">
+        <a class="btn-github" href="https://github.com/anisarve2006/E-waste-Dashboard" target="_blank" rel="noopener noreferrer">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/>
           </svg>
@@ -307,65 +307,94 @@
   <!-- Detail Modal -->
   <div class="modal-overlay" id="detailModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
     <div class="modal-dialog">
-      <button class="modal-close-btn" id="modalClose" type="button" aria-label="Close modal">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <line x1="18" y1="6" x2="6" y2="18"></line>
-          <line x1="6" y1="6" x2="18" y2="18"></line>
-        </svg>
-      </button>
-
-      <img class="modal-cover" id="modalCover" src="" alt="">
-
-      <div class="modal-content">
-        <div class="modal-header-meta">
+      <!-- Modal Top Control Bar -->
+      <div class="modal-topbar">
+        <div class="modal-topbar__left">
           <span class="badge-id" id="modalId">00</span>
           <span class="badge-type" id="modalType">ISA</span>
           <span class="tag-sticker" id="modalDate">Jul 2026</span>
-          <span class="tag-sticker" id="modalStatus">Submitted</span>
+          <span class="tag-sticker tag-sticker--status" id="modalStatus">Submitted</span>
         </div>
-
-        <p class="card__kicker" id="modalKicker">Kicker text</p>
-        <h2 class="modal-title" id="modalTitle">Submission Title</h2>
-        <p class="modal-desc" id="modalDesc">Detailed description goes here.</p>
-
-        <!-- Dynamic Key Metrics Box -->
-        <div class="modal-metrics-box" id="modalMetricsBox"></div>
-
-        <!-- HTML5 Video Player Container (if video exists) -->
-        <div class="modal-video-wrap" id="modalVideoWrap" style="display: none;">
-          <video class="modal-video-player" id="modalVideo" controls preload="metadata"></video>
-        </div>
-
-        <!-- Files & Links Section -->
-        <div class="modal-files-section">
-          <h3 class="modal-files-title">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-              <polyline points="14 2 14 8 20 8"></polyline>
-              <line x1="16" y1="13" x2="8" y2="13"></line>
-              <line x1="16" y1="17" x2="8" y2="17"></line>
-              <polyline points="10 9 9 9 8 9"></polyline>
-            </svg>
-            Available Files &amp; Live Links
-          </h3>
-          <div class="modal-files-list" id="modalFilesList"></div>
-        </div>
-
-        <!-- Navigation Buttons -->
-        <div class="modal-nav">
-          <button class="btn btn--ghost" id="modalPrevBtn" type="button">
-            <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M16 10H4M9 15l-5-5 5-5"/>
-            </svg>
-            Previous
-          </button>
-          <button class="btn btn--ghost" id="modalNextBtn" type="button">
-            Next
-            <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M4 10h12M11 5l5 5-5 5"/>
+        <div class="modal-topbar__right">
+          <span class="modal-kbd-hint" title="Press Escape to close"><kbd>ESC</kbd></span>
+          <button class="modal-close-btn" id="modalClose" type="button" aria-label="Close modal">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
             </svg>
           </button>
         </div>
+      </div>
+
+      <!-- Modal Body (Scrollable) -->
+      <div class="modal-scroll-body">
+        <!-- Visual Cover Showcase -->
+        <div class="modal-cover-stage">
+          <div class="modal-cover-frame">
+            <img class="modal-cover" id="modalCover" src="" alt="">
+          </div>
+        </div>
+
+        <div class="modal-content">
+          <div class="modal-title-group">
+            <p class="card__kicker" id="modalKicker">Kicker text</p>
+            <h2 class="modal-title" id="modalTitle">Submission Title</h2>
+            <div class="modal-tags" id="modalTags"></div>
+          </div>
+
+          <p class="modal-desc" id="modalDesc">Detailed description goes here.</p>
+
+          <!-- Dynamic Key Metrics Box -->
+          <div class="modal-metrics-box" id="modalMetricsBox"></div>
+
+          <!-- HTML5 Video Player Container (if video exists) -->
+          <div class="modal-video-wrap" id="modalVideoWrap" style="display: none;">
+            <div class="modal-video-header">
+              <span class="modal-video-dot"></span>
+              <span class="modal-video-title">Interactive Media Reel · MP4 Preview</span>
+            </div>
+            <video class="modal-video-player" id="modalVideo" controls preload="metadata"></video>
+          </div>
+
+          <!-- Files & Links Section -->
+          <div class="modal-files-section">
+            <div class="modal-files-header">
+              <h3 class="modal-files-title">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                  <polyline points="14 2 14 8 20 8"></polyline>
+                  <line x1="16" y1="13" x2="8" y2="13"></line>
+                  <line x1="16" y1="17" x2="8" y2="17"></line>
+                </svg>
+                Available Artifacts &amp; Live Tools
+              </h3>
+              <span class="modal-files-count" id="modalFilesCount"></span>
+            </div>
+            <div class="modal-files-list" id="modalFilesList"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Modal Footer Sticky Navigation -->
+      <div class="modal-foot-bar">
+        <button class="btn-modal-nav" id="modalPrevBtn" type="button" aria-label="Previous submission">
+          <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M15 10H5M9 14l-4-4 4-4"/>
+          </svg>
+          <span>Previous</span>
+        </button>
+
+        <div class="modal-nav-meta">
+          <span class="modal-counter" id="modalCounter">01 of 11</span>
+          <span class="modal-nav-shortcuts">Use <kbd>←</kbd> <kbd>→</kbd> keys</span>
+        </div>
+
+        <button class="btn-modal-nav" id="modalNextBtn" type="button" aria-label="Next submission">
+          <span>Next</span>
+          <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M5 10h10M11 6l4 4-4 4"/>
+          </svg>
+        </button>
       </div>
     </div>
   </div>
@@ -395,7 +424,7 @@
           <a href="#themes">01 Evidence</a>
           <a href="#themes">02 Recovery</a>
           <a href="#themes">03 Adoption</a>
-          <a href="https://github.com" target="_blank" rel="noopener noreferrer">Source Repo</a>
+          <a href="https://github.com/anisarve2006/E-waste-Dashboard" target="_blank" rel="noopener noreferrer">Source Repo</a>
         </div>
       </div>
     </div>

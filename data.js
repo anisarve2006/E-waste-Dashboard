@@ -13,8 +13,8 @@ const SITE = {
   academicYear: "2026–27",
   institution: "Vidyalankar Institute of Technology",
   department: "Department of Computer Engineering",
-  github: "https://github.com",
-  repo: "https://github.com",
+  github: "https://github.com/anisarve2006/E-waste-Dashboard",
+  repo: "https://github.com/anisarve2006/E-waste-Dashboard",
   live: "#",
   metrics: {
     submissions: 11,
