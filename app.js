@@ -97,7 +97,7 @@ document.addEventListener("DOMContentLoaded", () => {
         currentTransX += (targetTransX - currentTransX) * 0.1;
         currentTransY += (targetTransY - currentTransY) * 0.1;
 
-        globeStage.style.transform = `perspective(1000px) translate3d(${currentTransX.toFixed(2)}px, ${currentTransY.toFixed(2)}px, 0) rotateX(${currentRotX.toFixed(2)}deg) rotateY(${currentRotY.toFixed(2)}deg) scale(1.03)`;
+        globeStage.style.transform = `perspective(1000px) translate3d(${currentTransX.toFixed(2)}px, ${currentTransY.toFixed(2)}px, 0) rotateX(${currentRotX.toFixed(2)}deg) rotateY(${currentRotY.toFixed(2)}deg)`;
         rafId = requestAnimationFrame(updateMotion);
       }
 
